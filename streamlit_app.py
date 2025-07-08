@@ -18,10 +18,12 @@ st.sidebar.markdown(f"Weight of ESG Score (w2): **{w2:.2f}**")
 #ESG weight
 st.sidebar.markdown("---")
 st.sidebar.subheader("ESG Weight Settings")
-alpha=st.sidebar.slider("E - Environmental (α)", 0.0, 1.0, 0.33, 0.01)
-beta=st.sidebar.slider("S - Social (β)", 0.0, 1.0 - alpha, 0.33, 0.01)
-gamma = 1 - alpha - beta
-st.sidebar.markdown(f"G - Governance (γ): **{gamma:.2f}**")
+alpha=st.sidebar.number_input("E - Environmental (α)", 0.0, 1.0, 0.33, 0.01)
+beta=st.sidebar.number_input("S - Social (β)", 0.0, 1.0, 0.33, 0.01)
+gamma =st.sidebar.number_input("G - Governance (γ)", 0.0, 1.0, 0.34, 0.01)
+
+if not np.isclose(alpha+beta+gamma, 1.0):
+    st.sidebar.error(f"⚠️ The sum of α+β+γ must be 1 (currently {alpha+beta+gamma:.2f})")
 
 st.sidebar.markdown("---")
 
@@ -29,13 +31,13 @@ st.sidebar.markdown("---")
 st.subheader("Input Company Scores")
 col1,col2,col3,col4 = st.columns(4)
 with col1:
-    financial_score = st.number_input("Financial Score",0.0,100.0,75.0)
+    financial_score = st.number_input("Financial Score",0.0,100.0,80.0)
 with col2:
     E_score = st.number_input("E Score",0.0,100.0,80.0)
 with col3:
-    S_score = st.number_input("S Score",0.0,100.0,70.0)
+    S_score = st.number_input("S Score",0.0,100.0,80.0)
 with col4:
-    G_score = st.number_input("G Score",0.0,100.0, 5.0)
+    G_score = st.number_input("G Score",0.0,100.0,80.0)
 
 # Esg Multi Factors Model
 esg_score=alpha*E_score+beta*S_score+gamma*G_score
@@ -65,12 +67,12 @@ st.markdown("---")
 st.subheader("Credit Score Result")
 col5, col6 = st.columns(2)
 col5.metric("Final Credit Score", f"{credit_score:.2f}", help="Based on weights and input scores")
-col6.metric("Credit Rating", rating)
+col6.metric("Credit Rating (S&P Style)", rating)
 
 # Heatmap Visualization
 st.markdown("---")
 st.subheader("ESG vs Financial Score Sensitivity Heatmap")
-heatmap_param=st.selectbox("Choose ESG dimension for Heatmap",["E Score","S Score","G Score", "ESG Score Avg"])
+heatmap_param=st.selectbox("Choose ESG dimension for Heatmap",["E Score","S Score","G Score", "Same as ESG Weight"])
 E_range=np.linspace(0,100,20)
 F_range=np.linspace(0,100,20)
 Z=np.zeros((len(E_range), len(F_range)))
