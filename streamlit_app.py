@@ -18,9 +18,9 @@ st.sidebar.markdown(f"Weight of ESG Score (w2): **{w2:.2f}**")
 #ESG weight
 st.sidebar.markdown("---")
 st.sidebar.subheader("ESG Weight Settings")
-alpha=st.sidebar.number_input("E - Environmental (α)", 0.0, 1.0, 0.33, 0.01)
-beta=st.sidebar.number_input("S - Social (β)", 0.0, 1.0, 0.33, 0.01)
-gamma =st.sidebar.number_input("G - Governance (γ)", 0.0, 1.0, 0.34, 0.01)
+alpha=st.sidebar.number_input("E - Environmental (α)", 0.0, 1.0, 0.5, 0.01)
+beta=st.sidebar.number_input("S - Social (β)", 0.0, 1.0, 0.3, 0.01)
+gamma =st.sidebar.number_input("G - Governance (γ)", 0.0, 1.0, 0.2, 0.01)
 
 if not np.isclose(alpha+beta+gamma, 1.0):
     st.sidebar.error(f"⚠️ The sum of α+β+γ must be 1 (currently {alpha+beta+gamma:.2f})")
@@ -72,7 +72,7 @@ col6.metric("Credit Rating (S&P Style)", rating)
 # Heatmap Visualization
 st.markdown("---")
 st.subheader("ESG vs Financial Score Sensitivity Heatmap")
-heatmap_param=st.selectbox("Choose ESG dimension for Heatmap",["E Score","S Score","G Score", "Same as ESG Weight"])
+heatmap_param=st.selectbox("Choose ESG dimension for Heatmap",["E Score","S Score","G Score", "Same ESG Scores"])
 E_range=np.linspace(0,100,20)
 F_range=np.linspace(0,100,20)
 Z=np.zeros((len(E_range), len(F_range)))
