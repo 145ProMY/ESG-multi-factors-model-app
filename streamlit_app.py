@@ -8,7 +8,7 @@ st.set_page_config(page_title="ESG Credit Score Model",layout="wide")
 st.title("ESG Multi-Factor Credit Risk Scoring Model")
 
 # Sidebar inputs
-st.sidebar.header("🎛Parameter Settings")
+st.sidebar.header("Parameter Settings")
 
 #Credit score weight
 w1=st.sidebar.slider("Weight of Financial Score (w1)",0.0,1.0,0.7,0.01)
@@ -27,7 +27,7 @@ st.sidebar.markdown("---")
 
 #Input scores
 st.subheader("Input Company Scores")
-col1, col2, col3, col4 = st.columns(4)
+col1,col2,col3,col4 = st.columns(4)
 with col1:
     financial_score = st.number_input("Financial Score",0.0,100.0,75.0)
 with col2:
@@ -62,29 +62,45 @@ rating = classify(credit_score)
 
 # Output result
 st.markdown("---")
-st.subheader("📈 Credit Score Result")
+st.subheader("Credit Score Result")
 col5, col6 = st.columns(2)
 col5.metric("Final Credit Score", f"{credit_score:.2f}", help="Based on weights and input scores")
 col6.metric("Credit Rating", rating)
 
 # Heatmap Visualization
 st.markdown("---")
-st.subheader("🌡️ ESG vs Financial Score Sensitivity Heatmap")
-
+st.subheader("ESG vs Financial Score Sensitivity Heatmap")
+heatmap_param=st.selectbox("Choose ESG dimension for Heatmap",["E Score","S Score","G Score", "ESG Score Avg"])
 E_range=np.linspace(0,100,20)
 F_range=np.linspace(0,100,20)
 Z=np.zeros((len(E_range), len(F_range)))
-for i,E in enumerate(E_range):
+y_label = []
+
+for i,y in enumerate(E_range):
     for j,F in enumerate(F_range):
-        esg=alpha*E + beta*S_score + gamma*G_score
-        Z[i, j] = w1 * F + w2 * esg
+        if heatmap_param == "E Score":
+            E=y
+            S,G=S_score,G_score
+        elif heatmap_param=="S Score":
+            S=y
+            E,G=E_score,G_score
+        elif heatmap_param=="G Score":
+            G=y
+            E,S=E_score,S_score
+        else:
+            E=S=G=y
+
+        esg=alpha*E+beta*S+gamma*G
+        Z[i,j]=w1*F+w2*esg
+
+    y_label.append(f"{int(y)}")
 
 fig=px.imshow(Z,
                 x=[f"{int(f)}" for f in F_range],
-                y=[f"{int(e)}" for e in E_range],
-                labels=dict(x="Financial Score", y="E Score", color="Credit Score"),
+                y=y_label,
+                labels=dict(x="Financial Score", y=heatmap_param, color="Credit Score"),
                 aspect="auto",
-                color_continuous_scale="Viridis")
+                color_continuous_scale="RdYlGn")
 
 st.plotly_chart(fig, use_container_width=True)
 
